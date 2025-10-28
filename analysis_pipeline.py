@@ -3,6 +3,7 @@ import numpy as np
 from data import method1_data, method2_data
 import re 
 import math
+import matplotlib.pyplot as plt
 # constant variables 
 # E - charge to move up 
 # v_down - terminal velocity of the drop down 
@@ -309,4 +310,136 @@ print(q_table3)
 
 #second method - histogram of q values. Figure this out
 
-#uncertainty propogation - figure that bitch out 
+#uncertainty propogation - figure that bitch out
+
+# Plotting functions
+def plot_droplet_charge(charges, title="Droplet Index vs Charge", method_name=""):
+    """Plot droplet index vs charge."""
+    plt.figure(figsize=(12, 6))
+    
+    # Create droplet indices (0, 1, 2, ...)
+    droplet_indices = range(len(charges))
+    
+    # Convert charges to units of 10^-19 C
+    charges_scaled = charges / 1e-19
+    
+    # Plot the data (scatter only, no connecting lines)
+    plt.scatter(droplet_indices, charges_scaled, alpha=0.7, s=60, color='blue', edgecolors='black')
+    
+    plt.xlabel('Droplet Index')
+    plt.ylabel('Charge (×10⁻¹⁹ C)')
+    plt.title(f"{title} - {method_name}")
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+    plt.show()
+
+def plot_charge_histogram(charges, bins=20, title="Charge Distribution", method_name=""):
+    """Create histogram of charge values."""
+    plt.figure(figsize=(10, 6))
+    
+    # Convert charges to units of 10^-19 C
+    charges_scaled = charges / 1e-19
+    
+    plt.hist(charges_scaled, bins=bins, alpha=0.7, edgecolor='black', color='skyblue')
+    plt.xlabel('Charge (×10⁻¹⁹ C)')
+    plt.ylabel('Frequency')
+    plt.title(f"{title} - {method_name}")
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+    plt.show()
+
+def plot_all_charges():
+    """Plot charges from all three methods."""
+    # Extract charges from each table
+    charges1 = q_table['q_C'].dropna()
+    charges2 = q_table2['q_C'].dropna()
+    charges3 = q_table3['q_C'].dropna()
+    
+    print("Method 1 charges:")
+    print(f"  Number of droplets: {len(charges1)}")
+    print(f"  Mean: {charges1.mean():.2e} C")
+    print(f"  Std: {charges1.std():.2e} C")
+    print(f"  Range: {charges1.min():.2e} to {charges1.max():.2e} C")
+    
+    print("\nMethod 2 charges:")
+    print(f"  Number of droplets: {len(charges2)}")
+    print(f"  Mean: {charges2.mean():.2e} C")
+    print(f"  Std: {charges2.std():.2e} C")
+    print(f"  Range: {charges2.min():.2e} to {charges2.max():.2e} C")
+    
+    print("\nMethod 3 charges:")
+    print(f"  Number of droplets: {len(charges3)}")
+    print(f"  Mean: {charges3.mean():.2e} C")
+    print(f"  Std: {charges3.std():.2e} C")
+    print(f"  Range: {charges3.min():.2e} to {charges3.max():.2e} C")
+    
+    # Plot individual methods
+    if len(charges1) > 0:
+        plot_droplet_charge(charges1, "Droplet Index vs Charge", "Method 1")
+        plot_charge_histogram(charges1, title="Charge Distribution", method_name="Method 1")
+    
+    if len(charges2) > 0:
+        plot_droplet_charge(charges2, "Droplet Index vs Charge", "Method 2")
+        plot_charge_histogram(charges2, title="Charge Distribution", method_name="Method 2")
+    
+    if len(charges3) > 0:
+        plot_droplet_charge(charges3, "Droplet Index vs Charge", "Method 3")
+        plot_charge_histogram(charges3, title="Charge Distribution", method_name="Method 3")
+    
+    # Combined plot
+    plt.figure(figsize=(12, 8))
+    
+    if len(charges1) > 0:
+        plt.subplot(2, 2, 1)
+        charges1_scaled = charges1 / 1e-19
+        plt.scatter(range(len(charges1)), charges1_scaled, alpha=0.7, s=30, label='Method 1')
+        plt.xlabel('Droplet Index')
+        plt.ylabel('Charge (×10⁻¹⁹ C)')
+        plt.title('Method 1 Charges')
+        plt.grid(True, alpha=0.3)
+        plt.legend()
+    
+    if len(charges2) > 0:
+        plt.subplot(2, 2, 2)
+        charges2_scaled = charges2 / 1e-19
+        plt.scatter(range(len(charges2)), charges2_scaled, alpha=0.7, s=30, label='Method 2', color='orange')
+        plt.xlabel('Droplet Index')
+        plt.ylabel('Charge (×10⁻¹⁹ C)')
+        plt.title('Method 2 Charges')
+        plt.grid(True, alpha=0.3)
+        plt.legend()
+    
+    if len(charges3) > 0:
+        plt.subplot(2, 2, 3)
+        charges3_scaled = charges3 / 1e-19
+        plt.scatter(range(len(charges3)), charges3_scaled, alpha=0.7, s=30, label='Method 3', color='green')
+        plt.xlabel('Droplet Index')
+        plt.ylabel('Charge (×10⁻¹⁹ C)')
+        plt.title('Method 3 Charges')
+        plt.grid(True, alpha=0.3)
+        plt.legend()
+    
+    # Combined histogram
+    plt.subplot(2, 2, 4)
+    if len(charges1) > 0:
+        charges1_scaled = charges1 / 1e-19
+        plt.hist(charges1_scaled, bins=15, alpha=0.5, label='Method 1', color='blue')
+    if len(charges2) > 0:
+        charges2_scaled = charges2 / 1e-19
+        plt.hist(charges2_scaled, bins=15, alpha=0.5, label='Method 2', color='orange')
+    if len(charges3) > 0:
+        charges3_scaled = charges3 / 1e-19
+        plt.hist(charges3_scaled, bins=15, alpha=0.5, label='Method 3', color='green')
+    
+    plt.xlabel('Charge (×10⁻¹⁹ C)')
+    plt.ylabel('Frequency')
+    plt.title('All Methods - Charge Distribution')
+    plt.legend()
+    plt.grid(True, alpha=0.3)
+    
+    plt.tight_layout()
+    plt.show()
+
+# Run the plotting
+if __name__ == "__main__":
+    plot_all_charges() 
